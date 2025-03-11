@@ -12,16 +12,10 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.release>21</maven.compiler.release>
   </properties>
 
   <dependencies>
-    <!-- https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core -->
-    <!-- <dependency> -->
-        <!-- <groupId>org.hibernate.orm</groupId> -->
-        <!-- <artifactId>hibernate-core</artifactId> -->
-        <!-- <version>6.6.10.Final</version> -->
-    <!-- </dependency> -->
     <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
     <dependency>
         <groupId>org.springframework.boot</groupId>
