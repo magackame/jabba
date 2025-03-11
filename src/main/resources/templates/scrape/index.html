@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>jabba</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+  <nav>
+    <a href="/">query</a>
+    <a href="/scrape">list</a>
+  </nav>
+
+  <h1>Scrapes</h1>
+
+  <p style="text-align: center;" th:if="${scrapes.isEmpty()}">There is nothing here yet</p>
+  <p style="text-align: center;" th:if="${scrapes.isEmpty()}">Do a <a href="/">query</a> to populate the list</p>
+  <table th:if="${!scrapes.isEmpty()}" style="width: 100%;">
+    <tr>
+      <th>query</th>
+      <th>status</th>
+      <th>started</th>
+      <th>finished</th>
+    </tr>
+
+    <tr th:each="scrape: ${scrapes}">
+      <td style="text-align: center;"><a th:href="@{/scrape/{id}(id=${scrape.id})}" th:text="${scrape.query}"></a></td>
+      <td style="text-align: center;" th:text="${scrape.status}" />
+      <td style="text-align: center;" th:text="${#dates.format(scrape.started, 'yyyy-MM-dd HH:mm:ss')}" />
+
+      <td style="text-align: center;" th:if="${scrape.finished.isPresent()}" th:text="${#dates.format(scrape.finished.get(), 'yyyy-MM-dd HH:mm:ss')}" />
+      <td style="text-align: center;" th:if="${scrape.finished.isEmpty()}">-</td>
+    </tr>
+  </table>
+</body>
+</html>

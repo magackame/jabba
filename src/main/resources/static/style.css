@@ -1,0 +1,62 @@
+body {
+  padding: 1rem;
+  margin: 0;
+  width: calc(100% - 2rem);
+
+  margin: auto;
+  max-width: 80ch;
+
+  font-family: sans-serif;
+  line-height: 1.5;
+}
+
+input {
+  outline: none;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+}
+
+nav {
+  margin-bottom: 2rem;
+}
+
+nav a {
+  text-decoration: none;
+}
+
+table,
+th,
+td {
+  border: 2px solid black;
+  border-collapse: collapse;
+  padding: 0.5rem;
+}
+
+img {
+  display: block;
+  margin: auto;
+
+  max-width: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1c1b22;
+    color: white;
+  }
+
+  a:link {
+    color: #875fff;
+  }
+
+  a:visited {
+    color: magenta;
+  }
+
+  table,
+  th,
+  td {
+    border: 2px solid white;
+  }
+}

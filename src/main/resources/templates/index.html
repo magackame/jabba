@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>jabba</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+  <nav>
+    <a href="/">query</a>
+    <a href="/scrape">list</a>
+  </nav>
+
+  <form method="POST" action="/api/scrape">
+    <label style="display: block; text-align: center;" for="query">Enter the domain name without the TLD to query</label>
+    <br />
+
+    <input
+      required
+      style="width: 70%; margin: auto; display: block; text-align: center;"
+      name="query"
+      placeholder="domain"
+    />
+    <input type="submit" hidden />
+
+    <br />
+    <br />
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); grid-gap: 1rem;">
+      <div th:each="tld: ${tlds}">
+        <input type="checkbox" name="tlds[]" th:value="${tld.tld}" />
+        <label for="tlds[]" th:text="${tld.tld}" />
+      </div>
+    </div>
+  </form>
+</body>
+</html>

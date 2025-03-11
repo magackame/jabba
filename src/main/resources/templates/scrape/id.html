@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>jabba</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+  <nav>
+    <a href="/">query</a>
+    <a href="/scrape">list</a>
+  </nav>
+
+  <h1 th:text="'Scrape ' + ${scrape.query}"></h1>
+
+  <th:block th:switch="${scrape.status}">
+    <th:block th:case="${T(org.einsof.jabba.entities.ScrapeStatus).InProgress}">
+      <br />
+      <img alt="Mankanshoku Mako spinning like a loading indicator" src="/loading.gif" />
+      <br />
+      <p style="width: 100%; text-align: center;">Scraping...</p>
+    </th:block>
+
+    <th:block th:case="${T(org.einsof.jabba.entities.ScrapeStatus).Finished}">
+      <a th:href="@{/api/scrape/{id}(id=${scrape.id})}">excel</a>
+      <br />
+      <br />
+
+      <table style="width: 100%;">
+        <tr>
+          <th>domain</th>
+          <th>state</th>
+          <th>price, USD</th>
+          <th>renewal price, USD</th>
+          <th>latest history</th>
+        </tr>
+
+        <tr th:each="domain: ${scrape.domains}">
+          <td th:text="${domain.domain}" />
+          <td style="text-align: center;" th:text="${domain.state}" />
+          <td style="text-align: center;" th:text="${domain.price.orElse('-')}" />
+          <td style="text-align: center;" th:text="${domain.renewalPrice.orElse('-')}" />
+
+          <td style="text-align: center;" th:if="${domain.latestHistory.isPresent()}" th:text="${#dates.format(domain.latestHistory.get(), 'yyyy-MM-dd')}" />
+          <td style="text-align: center;" th:if="${domain.latestHistory.isEmpty()}">-</td>
+        </tr>
+      </table>
+    </th:block>
+
+    <th:block th:case="${T(org.einsof.jabba.entities.ScrapeStatus).Failed}">
+      <p style="text-align: center;">Failed to scrape</p>
+    </th:block>
+  </th:block>
+</body>
+</html>
