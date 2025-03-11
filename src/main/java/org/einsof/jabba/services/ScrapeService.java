@@ -80,7 +80,7 @@ public class ScrapeService {
     return this.scrapeRepository.findById(id);
   }
 
-  public Scrape doScrape(String query, HashSet<String> tlds) {
+  public Scrape spawnScrape(String query, HashSet<String> tlds) {
     final var scrape = new Scrape(query, ScrapeStatus.InProgress, new Date());
     this.scrapeRepository.save(scrape);
 
@@ -120,7 +120,7 @@ public class ScrapeService {
 
       final var futures = records
           .stream()
-          .map(record -> fetchLatestHistoryAsync(record.getDomain()))
+          .map(record -> fetchLatestHistory(record.getDomain()))
           .collect(Collectors.toList());
       CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
       final var latestHistories = futures
@@ -321,7 +321,7 @@ public class ScrapeService {
     return stream.toByteArray();
   }
 
-  public static CompletableFuture<WaybackResponse> fetchHistoryAsync(String url, boolean skipLock) {
+  public static CompletableFuture<WaybackResponse> fetchHistory(String url, boolean skipLock) {
     if (!skipLock) {
       try {
         rateLimiter.acquire();
@@ -346,7 +346,7 @@ public class ScrapeService {
             return CompletableFuture
                 .supplyAsync(() -> {
                   try {
-                    return fetchHistoryAsync(url, true).get();
+                    return fetchHistory(url, true).get();
                   } catch (Exception e) {
                     throw new CompletionException(e);
                   }
@@ -374,8 +374,8 @@ public class ScrapeService {
         });
   }
 
-  public static CompletableFuture<Optional<Date>> fetchLatestHistoryAsync(String domain) {
-    return fetchHistoryAsync("https://" + domain, false)
+  public static CompletableFuture<Optional<Date>> fetchLatestHistory(String domain) {
+    return fetchHistory("https://" + domain, false)
         .thenCompose(httpsResponse -> {
           final var httpsSnapshot = httpsResponse.archivedSnapshots.closest;
 
@@ -384,7 +384,7 @@ public class ScrapeService {
 
             return CompletableFuture.supplyAsync(() -> latestHistory);
           } else {
-            return fetchHistoryAsync("http://" + domain, false)
+            return fetchHistory("http://" + domain, false)
                 .thenApply(httpResponse -> {
                   final var httpSnapshot = httpResponse.archivedSnapshots.closest;
                   final var latestHistory = httpSnapshot.map(snapshot -> snapshot.timestamp);

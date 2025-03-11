@@ -38,7 +38,7 @@ public class Api {
       t.add(tld.getTld());
     }
 
-    final var scrape = scrapeService.doScrape(query, tlds.orElse(t));
+    final var scrape = scrapeService.spawnScrape(query, tlds.orElse(t));
 
     return new RedirectView("/scrape/" + scrape.getId());
   }
