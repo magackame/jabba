@@ -289,7 +289,7 @@ public class ScrapeService {
       state.getCellStyle().setBorderRight(BorderStyle.THIN);
 
       final var price = row.createCell(2 + cellOffset);
-      price.setCellValue(record.getPrice().orElse(""));
+      price.setCellValue(record.getPrice().orElse("-"));
       price.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
       price.getCellStyle().setBorderLeft(BorderStyle.THIN);
       price.getCellStyle().setBorderTop(BorderStyle.THIN);
@@ -297,7 +297,7 @@ public class ScrapeService {
       price.getCellStyle().setBorderRight(BorderStyle.THIN);
 
       final var renewalPrice = row.createCell(3 + cellOffset);
-      renewalPrice.setCellValue(record.getRenewalPrice().orElse(""));
+      renewalPrice.setCellValue(record.getRenewalPrice().orElse("-"));
       renewalPrice.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
       renewalPrice.getCellStyle().setBorderLeft(BorderStyle.THIN);
       renewalPrice.getCellStyle().setBorderTop(BorderStyle.THIN);
@@ -306,7 +306,7 @@ public class ScrapeService {
 
       final var dateFormat = new SimpleDateFormat("yyyy-MM-dd");
       final var latestHistory = row.createCell(4 + cellOffset);
-      latestHistory.setCellValue(record.getLatestHistory().map(date -> dateFormat.format(date)).orElse(""));
+      latestHistory.setCellValue(record.getLatestHistory().map(date -> dateFormat.format(date)).orElse("-"));
       latestHistory.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
       latestHistory.getCellStyle().setBorderLeft(BorderStyle.THIN);
       latestHistory.getCellStyle().setBorderTop(BorderStyle.THIN);

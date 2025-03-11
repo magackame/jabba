@@ -22,6 +22,10 @@
       <img alt="Mankanshoku Mako spinning like a loading indicator" src="/loading.gif" />
       <br />
       <p style="width: 100%; text-align: center;">Scraping...</p>
+
+      <script>
+        setTimeout(() => window.location.reload(), 5000);
+      </script>
     </th:block>
 
     <th:block th:case="${T(org.einsof.jabba.entities.ScrapeStatus).Finished}">
