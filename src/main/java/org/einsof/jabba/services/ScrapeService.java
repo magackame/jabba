@@ -1,12 +1,9 @@
 package org.einsof.jabba.services;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,9 +17,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.einsof.jabba.entities.Domain;
 import org.einsof.jabba.entities.DomainState;
 import org.einsof.jabba.entities.Scrape;
@@ -84,8 +78,6 @@ public class ScrapeService {
     final var scrape = new Scrape(query, ScrapeStatus.InProgress, new Date());
     this.scrapeRepository.save(scrape);
 
-    // TODO: handle exc
-    // TODO: spawn multiple
     taskExecutor.execute(() -> {
       final var options = new ChromeOptions();
 
@@ -97,7 +89,6 @@ public class ScrapeService {
       }
 
       options.addArguments("--remote-allow-origins=*");
-      // TODO: headless detection
       options.addArguments("--headless");
       options.addArguments("--window-size=1920,1080");
       options.addArguments("--disable-blink-features=AutomationControlled");
@@ -108,8 +99,6 @@ public class ScrapeService {
 
       List<Domain> records;
       try {
-        // TODO: prase sidebar
-        // TODO: extract SALE
         records = scrape(driver, query, tlds);
       } catch (Exception e) {
         System.err.println("failed to scrape: " + e);
@@ -132,7 +121,6 @@ public class ScrapeService {
         records.get(i).setLatestHistory(latestHistories.get(i));
       }
 
-      // TODO: reuse driver?
       driver.quit();
 
       scrape.setStatus(ScrapeStatus.Finished);
@@ -219,108 +207,6 @@ public class ScrapeService {
     return records;
   }
 
-  public static byte[] excel(String sheetName, List<Domain> records) throws IOException {
-    final var workbook = new XSSFWorkbook();
-    final var sheet = workbook.createSheet(sheetName);
-
-    final var rowOffset = 1;
-    final var cellOffset = 1;
-
-    final var header = sheet.createRow(0 + rowOffset);
-
-    final var d = header.createCell(0 + cellOffset);
-    d.setCellValue("domain");
-    d.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
-    d.getCellStyle().setBorderLeft(BorderStyle.THIN);
-    d.getCellStyle().setBorderTop(BorderStyle.THIN);
-    d.getCellStyle().setBorderBottom(BorderStyle.THIN);
-    d.getCellStyle().setBorderRight(BorderStyle.THIN);
-
-    final var s = header.createCell(1 + cellOffset);
-    s.setCellValue("status");
-    s.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
-    s.getCellStyle().setBorderLeft(BorderStyle.THIN);
-    s.getCellStyle().setBorderTop(BorderStyle.THIN);
-    s.getCellStyle().setBorderBottom(BorderStyle.THIN);
-    s.getCellStyle().setBorderRight(BorderStyle.THIN);
-
-    final var p = header.createCell(2 + cellOffset);
-    p.setCellValue("price, USD");
-    p.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
-    p.getCellStyle().setBorderLeft(BorderStyle.THIN);
-    p.getCellStyle().setBorderTop(BorderStyle.THIN);
-    p.getCellStyle().setBorderBottom(BorderStyle.THIN);
-    p.getCellStyle().setBorderRight(BorderStyle.THIN);
-
-    final var rp = header.createCell(3 + cellOffset);
-    rp.setCellValue("renewal price, USD");
-    rp.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
-    rp.getCellStyle().setBorderLeft(BorderStyle.THIN);
-    rp.getCellStyle().setBorderTop(BorderStyle.THIN);
-    rp.getCellStyle().setBorderBottom(BorderStyle.THIN);
-    rp.getCellStyle().setBorderRight(BorderStyle.THIN);
-
-    final var lh = header.createCell(4 + cellOffset);
-    lh.setCellValue("latest history");
-    lh.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
-    lh.getCellStyle().setBorderLeft(BorderStyle.THIN);
-    lh.getCellStyle().setBorderTop(BorderStyle.THIN);
-    lh.getCellStyle().setBorderBottom(BorderStyle.THIN);
-    lh.getCellStyle().setBorderRight(BorderStyle.THIN);
-
-    for (var i = 0; i < records.size(); ++i) {
-      final var record = records.get(i);
-      final var row = sheet.createRow(i + 1 + rowOffset);
-
-      final var domain = row.createCell(0 + cellOffset);
-      domain.setCellValue(record.getDomain());
-      domain.getCellStyle().setAlignment(HorizontalAlignment.LEFT);
-      domain.getCellStyle().setBorderLeft(BorderStyle.THIN);
-      domain.getCellStyle().setBorderTop(BorderStyle.THIN);
-      domain.getCellStyle().setBorderBottom(BorderStyle.THIN);
-      domain.getCellStyle().setBorderRight(BorderStyle.THIN);
-
-      final var state = row.createCell(1 + cellOffset);
-      state.setCellValue(record.getState().toString());
-      state.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
-      state.getCellStyle().setBorderLeft(BorderStyle.THIN);
-      state.getCellStyle().setBorderTop(BorderStyle.THIN);
-      state.getCellStyle().setBorderBottom(BorderStyle.THIN);
-      state.getCellStyle().setBorderRight(BorderStyle.THIN);
-
-      final var price = row.createCell(2 + cellOffset);
-      price.setCellValue(record.getPrice().orElse("-"));
-      price.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
-      price.getCellStyle().setBorderLeft(BorderStyle.THIN);
-      price.getCellStyle().setBorderTop(BorderStyle.THIN);
-      price.getCellStyle().setBorderBottom(BorderStyle.THIN);
-      price.getCellStyle().setBorderRight(BorderStyle.THIN);
-
-      final var renewalPrice = row.createCell(3 + cellOffset);
-      renewalPrice.setCellValue(record.getRenewalPrice().orElse("-"));
-      renewalPrice.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
-      renewalPrice.getCellStyle().setBorderLeft(BorderStyle.THIN);
-      renewalPrice.getCellStyle().setBorderTop(BorderStyle.THIN);
-      renewalPrice.getCellStyle().setBorderBottom(BorderStyle.THIN);
-      renewalPrice.getCellStyle().setBorderRight(BorderStyle.THIN);
-
-      final var dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-      final var latestHistory = row.createCell(4 + cellOffset);
-      latestHistory.setCellValue(record.getLatestHistory().map(date -> dateFormat.format(date)).orElse("-"));
-      latestHistory.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
-      latestHistory.getCellStyle().setBorderLeft(BorderStyle.THIN);
-      latestHistory.getCellStyle().setBorderTop(BorderStyle.THIN);
-      latestHistory.getCellStyle().setBorderBottom(BorderStyle.THIN);
-      latestHistory.getCellStyle().setBorderRight(BorderStyle.THIN);
-    }
-
-    final var stream = new ByteArrayOutputStream();
-    workbook.write(stream);
-    workbook.close();
-
-    return stream.toByteArray();
-  }
-
   public static CompletableFuture<WaybackResponse> fetchHistory(String url, boolean skipLock) {
     if (!skipLock) {
       try {
@@ -340,8 +226,6 @@ public class ScrapeService {
     return httpClient
         .sendAsync(request, HttpResponse.BodyHandlers.ofString())
         .thenCompose(response -> {
-          // System.out.println("status: " + response.statusCode());
-
           if (response.statusCode() == 429) {
             return CompletableFuture
                 .supplyAsync(() -> {

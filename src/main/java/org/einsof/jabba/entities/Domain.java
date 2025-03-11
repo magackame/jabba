@@ -50,7 +50,6 @@ public class Domain {
     return this.state;
   }
 
-  // TODO: BigDecimal?
   public Optional<String> getPrice() {
     if (this.price != null) {
       return Optional.of(this.price);
